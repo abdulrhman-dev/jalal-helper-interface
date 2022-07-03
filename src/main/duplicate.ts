@@ -20,14 +20,30 @@ export const configure = (value: ClientConfig) => {
   config = value;
 };
 
+const getClientObject = (index: number) => {
+  const sheet = workbook.getSheet(config.sheetName);
+  const keys = Object.keys(duplicateObject);
+
+  return duplicateObject[keys[index]].map((item) => ({
+    [config.identifierKey]: sheet.get(config.identifierKey, item.index),
+    // TODO: THIS IS TEMP
+    [config.duplicateKey]: sheet.get(config.duplicateKey, item.index),
+    row: item.index + sheet.headerIndex + 2,
+  }));
+};
+
 export const getDuplicateObject = (): object => {
   if (!config) return {};
   if (!workbook) return {};
-  duplicateObject = findDuplicats(
-    workbook.getSheet(config.sheetName).getColumn(config.duplicateKey)
-  );
+  const sheet = workbook.getSheet(config.sheetName);
 
-  return duplicateObject;
+  duplicateObject = findDuplicats(sheet.getColumn(config.duplicateKey));
+
+  const keys = Object.keys(duplicateObject);
+
+  if (keys.length === 0) return [];
+
+  return { object: getClientObject(0), total: keys.length };
 };
 
 export const deleteSingleDuplicate = (currentIndex: number) => {
@@ -40,7 +56,7 @@ export const deleteSingleDuplicate = (currentIndex: number) => {
     workbook.getSheet(config.sheetName)
   );
 
-  return duplicateObject;
+  return { object: getClientObject(currentIndex + 1) };
 };
 
 export function excute() {}

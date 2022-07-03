@@ -1,13 +1,18 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Stack, SegmentedControl, Select, Button } from '@mantine/core';
 import SettingsIcon from '@mui/icons-material/Settings';
+import { useSetDuplicate } from 'renderer/providers/DuplicateProvider';
 
 export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
+  const navigate = useNavigate();
   const [choosenSheet, setChoosenSheet] = useState('');
   const [duplicateChoices, setDuplicateChoices] = useState([]);
   const [duplicateTarget, setDuplicateTarget] = useState('');
   const [identifierChoices, setIdentifierChoices] = useState([]);
   const [identifier, setIdentifier] = useState('');
+
+  const setDuplicate = useSetDuplicate();
 
   const configure = useCallback(
     (index: number) => {
@@ -46,20 +51,21 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
   };
 
   const configureXLSXfile = async () => {
-    const duplicateObj = await window.electron.ipcRenderer.invokeAsync(
-      'configure',
-      {
-        duplicateKey: duplicateTarget,
-        identifierKey: identifier,
-        sheetName: choosenSheet,
-      }
-    );
+    const duplicateObj = await window.electron.ipcRenderer.invokeAsync<{
+      object: object;
+      total: number;
+    }>('configure', {
+      duplicateKey: duplicateTarget,
+      identifierKey: identifier,
+      sheetName: choosenSheet,
+    });
+    setDuplicate({
+      duplicate: duplicateObj.object,
+      total: duplicateObj.total,
+      currentIndex: 0,
+    });
 
-    const duplicateObj2 = await window.electron.ipcRenderer.invokeAsync(
-      'delete-duplicate',
-      0
-    );
-    console.log(duplicateObj, duplicateObj2);
+    navigate('/duplicates', { replace: true });
   };
 
   return (

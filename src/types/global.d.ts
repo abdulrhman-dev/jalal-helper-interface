@@ -26,4 +26,12 @@ declare global {
     duplicateKey: string;
     identifierKey: string;
   }
+
+  interface DuplicateState {
+    duplicate: any[];
+    currentIndex: number;
+    total: number;
+  }
+
+  type CallbackFunction = () => void;
 }
