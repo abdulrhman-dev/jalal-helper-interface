@@ -46,15 +46,28 @@ export const getDuplicateObject = (): object => {
   return { object: getClientObject(0), total: keys.length };
 };
 
-export const deleteSingleDuplicate = (currentIndex: number) => {
-  if (Object.keys(duplicateObject).length === 0) return {};
+export const deleteSingleDuplicate = (
+  currentIndex: number,
+  newIdentfier: string
+) => {
+  const keys = Object.keys(duplicateObject);
+  if (keys.length === 0 || keys.length - 1 <= currentIndex) return {};
 
   duplicateObject = deleteDuplicates(
     duplicateObject,
     currentIndex,
     workbook,
-    workbook.getSheet(config.sheetName)
+    workbook.getSheet(config.sheetName),
+    config.identifierKey,
+    newIdentfier
   );
+
+  return { object: getClientObject(currentIndex + 1) };
+};
+
+export const skipSingleDuplicate = (currentIndex: number) => {
+  const keys = Object.keys(duplicateObject);
+  if (keys.length === 0 || keys.length - 1 <= currentIndex) return {};
 
   return { object: getClientObject(currentIndex + 1) };
 };

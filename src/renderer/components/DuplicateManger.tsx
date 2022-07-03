@@ -1,5 +1,5 @@
 import { Stack, Table, Progress, Button, Autocomplete } from '@mantine/core';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   useDuplicate,
@@ -8,14 +8,30 @@ import {
 
 export default function DuplicateManger() {
   const { duplicate, currentIndex, total } = useDuplicate();
+  const [identifierState, setIdentifierState] = useState({
+    list: [],
+    value: '',
+    error: '',
+  });
+  const setDuplicate = useSetDuplicate();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (duplicate.length === 0) navigate('/configure', { replace: true });
+    const keys = Object.keys(duplicate[0]);
+
+    const identifierList = [...new Set(duplicate.map((item) => item[keys[0]]))];
+
+    setIdentifierState({
+      error: '',
+      value: '',
+      list: identifierList,
+    });
   }, [duplicate, navigate]);
 
   if (duplicate.length !== 0) {
     const keys = Object.keys(duplicate[0]);
+
     const header = keys.map((headerKey) => (
       <th key={headerKey}>{headerKey}</th>
     ));
@@ -27,6 +43,47 @@ export default function DuplicateManger() {
         ))}
       </tr>
     ));
+
+    const handleSkipDuplicate = async () => {
+      const result = await window.electron.ipcRenderer.invokeAsync<{
+        object: object | undefined;
+      }>('skip-duplicate', currentIndex);
+
+      if (result.object === undefined)
+        navigate('/configure', { replace: true });
+
+      setDuplicate({
+        duplicate: result.object,
+        currentIndex: currentIndex + 1,
+        total,
+      });
+    };
+
+    const handleMergeDuplicate = async () => {
+      if (identifierState.value === '') {
+        setIdentifierState({
+          ...identifierState,
+          error: 'you must enter an identifier to continue',
+        });
+        return;
+      }
+
+      const result = await window.electron.ipcRenderer.invokeAsync<{
+        object: object | undefined;
+      }>('delete-duplicate', {
+        index: currentIndex,
+        newIdentfier: identifierState.value,
+      });
+
+      if (result.object === undefined)
+        navigate('/configure', { replace: true });
+
+      setDuplicate({
+        duplicate: result.object,
+        currentIndex: currentIndex + 1,
+        total,
+      });
+    };
 
     return (
       <div className="container">
@@ -45,12 +102,19 @@ export default function DuplicateManger() {
             <tbody>{rows}</tbody>
           </Table>
           <Autocomplete
-            label="New Merge identifier"
-            placeholder="Pick one"
-            data={[...new Set(duplicate.map((item) => item[keys[0]]))]}
+            error={identifierState.error !== '' ? identifierState.error : null}
+            label="New Merge identifier..."
+            placeholder="Start typeing your identifier"
+            value={identifierState.value}
+            onChange={(e) =>
+              setIdentifierState({ ...identifierState, value: e })
+            }
+            data={identifierState.list}
           />
-          <Button>Merge</Button>
-          <Button variant="light">Skip</Button>
+          <Button onClick={handleMergeDuplicate}>Merge</Button>
+          <Button onClick={handleSkipDuplicate} variant="light">
+            Skip
+          </Button>
         </Stack>
       </div>
     );

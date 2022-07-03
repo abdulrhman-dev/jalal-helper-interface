@@ -1,6 +1,10 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-export type Channels = 'get-data-xlsx' | 'configure' | 'delete-duplicate';
+export type Channels =
+  | 'get-data-xlsx'
+  | 'configure'
+  | 'delete-duplicate'
+  | 'skip-duplicate';
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {

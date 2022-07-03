@@ -20,6 +20,7 @@ import {
   getDuplicateObject,
   getSheets,
   initialize,
+  skipSingleDuplicate,
 } from './duplicate';
 
 class AppUpdater {
@@ -160,8 +161,12 @@ async function registerListeners() {
     return getDuplicateObject();
   });
 
-  ipcMain.handle('delete-duplicate', (_, index: number) => {
-    return deleteSingleDuplicate(index);
+  ipcMain.handle('delete-duplicate', (_, res: any) => {
+    return deleteSingleDuplicate(res.index, res.newIdentfier);
+  });
+
+  ipcMain.handle('skip-duplicate', (_, index: number) => {
+    return skipSingleDuplicate(index);
   });
 }
 
