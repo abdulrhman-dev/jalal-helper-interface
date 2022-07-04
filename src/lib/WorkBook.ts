@@ -61,7 +61,7 @@ class Workbook {
   }
 
   save(directory?: string, options?: XLSX.WritingOptions) {
-    XLSX.writeFileXLSX(
+    XLSX.writeFile(
       this._workbook,
       directory !== undefined ? directory : this.filename,
       options

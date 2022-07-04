@@ -59,6 +59,9 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
       identifierKey: identifier,
       sheetName: choosenSheet,
     });
+
+    console.log(duplicateObj);
+
     setDuplicate({
       duplicate: duplicateObj.object,
       total: duplicateObj.total,

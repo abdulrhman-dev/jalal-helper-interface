@@ -155,8 +155,22 @@ async function registerListeners() {
     }
   });
 
-  ipcMain.handle('configure', (_, config: ClientConfig) => {
-    configure(config);
+  ipcMain.handle('configure', async (_, config: ClientConfig) => {
+    let { filePath } = await dialog.showSaveDialog(mainWindow, {
+      filters: [
+        {
+          name: 'XLSX File',
+          extensions: ['xlsx'],
+        },
+      ],
+    });
+
+    if (filePath === '') filePath = undefined;
+
+    configure({
+      ...config,
+      filePath,
+    });
 
     return getDuplicateObject();
   });

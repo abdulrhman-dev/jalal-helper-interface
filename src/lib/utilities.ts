@@ -84,7 +84,7 @@ function shift(index: number, arr: number[]) {
   return shiftAmount;
 }
 
-function updateDuplicates(
+export function updateDuplicates(
   duplicateObject: object,
   currentIndex: number,
   indexArr: number[]
@@ -102,36 +102,4 @@ function updateDuplicates(
   }
 
   return duplicateObject;
-}
-
-export function deleteDuplicates(
-  duplicateObject: object,
-  currentIndex: number,
-  workbook: WorkBook,
-  sheet: WorkSheet,
-  identfierKey: string,
-  newIdentfier: string
-) {
-  const keys = Object.keys(duplicateObject);
-  const duplicates: ColumnItem[] = duplicateObject[keys[currentIndex]];
-  const indexArr: number[] = [];
-  const first = duplicates[0];
-
-  let shiftAmount = 0;
-
-  for (let i = 1; i < duplicates.length; i++) {
-    // eslint-disable-next-line prefer-destructuring
-    const index = duplicates[i].index;
-    sheet.deleteRow(index - shiftAmount);
-    shiftAmount++;
-    indexArr.push(index);
-  }
-
-  sheet.set(identfierKey, newIdentfier, first.index);
-
-  workbook.save();
-
-  if (keys.length === currentIndex + 1) return duplicateObject;
-
-  return updateDuplicates(duplicateObject, currentIndex + 1, indexArr);
 }

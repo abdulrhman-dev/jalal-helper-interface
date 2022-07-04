@@ -18,15 +18,19 @@ export default function DuplicateManger() {
 
   useEffect(() => {
     if (duplicate.length === 0) navigate('/configure', { replace: true });
-    const keys = Object.keys(duplicate[0]);
+    else {
+      const keys = Object.keys(duplicate[0]);
 
-    const identifierList = [...new Set(duplicate.map((item) => item[keys[0]]))];
+      const identifierList = [
+        ...new Set(duplicate.map((item) => item[keys[0]])),
+      ];
 
-    setIdentifierState({
-      error: '',
-      value: '',
-      list: identifierList,
-    });
+      setIdentifierState({
+        error: '',
+        value: '',
+        list: identifierList,
+      });
+    }
   }, [duplicate, navigate]);
 
   if (duplicate.length !== 0) {

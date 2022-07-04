@@ -25,6 +25,7 @@ declare global {
     sheetName: string;
     duplicateKey: string;
     identifierKey: string;
+    filePath: string | undefined;
   }
 
   interface DuplicateState {
