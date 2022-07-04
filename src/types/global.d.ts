@@ -13,7 +13,7 @@ declare global {
   interface ColumnItem {
     value: XlsxAcceptedTypes;
     index: number;
-    key: string;
+    key: string | undefined;
   }
 
   interface ClientSheet {

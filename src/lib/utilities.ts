@@ -1,11 +1,12 @@
+/* eslint-disable radix */
+/* eslint-disable no-continue */
 /* eslint-disable no-plusplus */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-undef */
 import * as XLSX from 'xlsx';
-import WorkBook from './WorkBook';
 import WorkSheet from './WorkSheet';
 
-const ec = (r, c) => {
+export const ec = (r, c) => {
   return XLSX.utils.encode_cell({ r, c });
 };
 
@@ -102,4 +103,104 @@ export function updateDuplicates(
   }
 
   return duplicateObject;
+}
+
+function searchAndDeploy(
+  sheet: WorkSheet,
+  key: string,
+  value: XlsxAcceptedTypes,
+  mainIndex: number
+) {
+  const currHeaderIndex = sheet.getHeaderIndex(key);
+  const prevHeader = sheet.getHeaderAtIndex(currHeaderIndex - 1);
+  const nextHeader = sheet.getHeaderAtIndex(currHeaderIndex + 1);
+
+  const isOccupied = sheet.isOccupied(
+    ec(mainIndex + sheet.headerIndex + 1, nextHeader?.position.c)
+  );
+
+  const [currHeaderName, currHeaderNumber = '1'] = key.split('_');
+
+  if (nextHeader === undefined) {
+    const newHeaderName = [currHeaderName, parseInt(currHeaderNumber) + 1].join(
+      '_'
+    );
+    sheet.pushHeader(newHeaderName);
+    sheet.set(newHeaderName, value, mainIndex);
+    return;
+  }
+
+  const [nextHeaderName] = nextHeader.key.split('_');
+
+  if (!isOccupied) {
+    if (nextHeaderName === currHeaderName) {
+      sheet.set(nextHeader?.key, value, mainIndex);
+      return;
+    }
+
+    const newHeaderName = [currHeaderName, parseInt(currHeaderNumber) + 1].join(
+      '_'
+    );
+    sheet.shiftColumn(currHeaderIndex + 1, 1);
+    sheet.setHeader(
+      [currHeaderName, parseInt(currHeaderNumber) + 1].join('_'),
+      currHeaderIndex + 1
+    );
+    sheet.set(newHeaderName, value, mainIndex);
+    return;
+  }
+
+  if (nextHeaderName === currHeaderName) {
+    searchAndDeploy(sheet, nextHeader.key, value, mainIndex);
+    return;
+  }
+
+  if (prevHeader?.key === undefined) return;
+
+  const [prevHeaderName] = prevHeader.key.split('_');
+
+  if (prevHeaderName === currHeaderName) {
+    const newHeaderName = [currHeaderName, parseInt(currHeaderNumber) + 1].join(
+      '_'
+    );
+    sheet.shiftColumn(currHeaderIndex + 1, 1);
+    sheet.setHeader(
+      [currHeaderName, parseInt(currHeaderNumber) + 1].join('_'),
+      currHeaderIndex + 1
+    );
+    sheet.set(newHeaderName, value, mainIndex);
+  }
+}
+
+export function updateMergeTarget(
+  sheet: WorkSheet,
+  rows: ColumnItem[][],
+  main: ColumnItem[]
+) {
+  const mainIndex = main[0].index;
+
+  for (let R = 0; R < rows.length; R++) {
+    const row = rows[R];
+    if (row.length === 2) continue;
+
+    for (let C = 2; C < row.length; C++) {
+      const column = row[C];
+      if (!column.key) continue;
+
+      const mainTarget = sheet.getRow(mainIndex);
+      const exists = mainTarget.find(
+        (mainColumn) => mainColumn.key === column.key
+      );
+
+      if (!exists) {
+        sheet.set(column.key, column.value, mainIndex);
+        continue;
+      }
+
+      if (exists?.value === column.value) continue;
+
+      // search and deploy
+      searchAndDeploy(sheet, column.key, column.value, mainIndex);
+    }
+  }
 }

@@ -3,7 +3,8 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 import * as XLSX from 'xlsx';
-import { deleteRowUtility, getType } from './utilities';
+// eslint-disable-next-line import/no-cycle
+import { deleteRowUtility, getType, ec } from './utilities';
 
 class WorkSheet {
   private _sheet: XLSX.WorkSheet;
@@ -87,12 +88,15 @@ class WorkSheet {
       range.e.r = cell.r;
     }
 
-    this.headers = this.setHeaders();
     this._sheet['!ref'] = XLSX.utils.encode_range({ s: range.s, e: range.e });
+    this.headers = this.setHeaders();
   }
 
   isOccupied(cellName: string) {
-    return this._sheet[cellName] !== undefined;
+    return (
+      this._sheet[cellName] !== undefined &&
+      this._sheet[cellName].v !== undefined
+    );
   }
 
   setHeaders() {
@@ -110,13 +114,10 @@ class WorkSheet {
       const cellName = XLSX.utils.encode_cell(cellPosition);
       // eslint-disable-next-line no-continue
       if (!this.isOccupied(cellName)) continue;
-
       const cell = this._sheet[cellName];
-
       // check if it exists
       if (this.uniqueHeaders && headers.find((header) => header.key === cell.v))
         this.uniqueHeaders = false;
-
       headers.push({
         data: cell,
         position: cellPosition,
@@ -128,7 +129,11 @@ class WorkSheet {
   }
 
   pushHeader(value: string) {
-    if (this.headers.find((header) => header.key === value))
+    if (
+      this.headers.find((header) => {
+        return header.key === value;
+      })
+    )
       throw new Error('header already exists');
 
     const position = { c: this.headers.length, r: this.headerIndex };
@@ -165,12 +170,14 @@ class WorkSheet {
       data: { t: 's', v: value },
     };
 
-    if (column < this.headers.length) {
-      this.headers[column] = header;
-      return;
-    }
-
     this.headers.push(header);
+  }
+
+  getHeaderIndex(key: string) {
+    const match = this.headers.find((header) => header.key === key);
+    if (!match) return -1;
+
+    return match.position.c;
   }
 
   set(key: string, value: XlsxAcceptedTypes, rowIndex: number) {
@@ -240,6 +247,68 @@ class WorkSheet {
         key: header.key,
         value: this._sheet[cell].v,
         index: i,
+      });
+    }
+
+    return data;
+  }
+
+  shiftColumn(startingIndex: number, amount: number) {
+    if (!this._sheet['!ref']) throw new Error('ref for sheet was not found');
+    const range = XLSX.utils.decode_range(this._sheet['!ref']);
+
+    const {
+      e: { c: columnNumber, r: rowNumber },
+    } = range;
+
+    if (startingIndex > columnNumber)
+      throw new Error('startingIndex is not in range for column size');
+
+    for (let C = columnNumber; C >= startingIndex; C--) {
+      for (let R = 0; R <= rowNumber; R++) {
+        this._sheet[ec(R, C + amount)] = this._sheet[ec(R, C)];
+        this._sheet[ec(R, C)] = undefined;
+      }
+    }
+
+    range.e.c += amount;
+    this._sheet['!ref'] = XLSX.utils.encode_range(range);
+    this.headers = this.setHeaders();
+  }
+
+  getHeaderAtIndex(index: number) {
+    const header = this.headers.find(
+      (headerItem) => headerItem.position.c === index
+    );
+
+    return header;
+  }
+
+  getRow(rowIndex: number, ignoreEmpty = true) {
+    if (!this._sheet['!ref']) throw new Error('ref for sheet was not found');
+    const range = XLSX.utils.decode_range(this._sheet['!ref']);
+
+    const {
+      e: { c: columnNumber },
+    } = range;
+
+    const R = rowIndex + this.headerIndex + 1;
+
+    const data: ColumnItem[] = [];
+
+    for (let C = 0; C <= columnNumber; C++) {
+      const cell = ec(R, C);
+
+      if (!this._sheet[cell] || !this._sheet[cell].v) {
+        // eslint-disable-next-line no-continue
+        if (ignoreEmpty) continue;
+
+        this._sheet[cell] = { v: null };
+      }
+      data.push({
+        key: this.getHeaderAtIndex(C)?.key,
+        value: this._sheet[cell].v,
+        index: rowIndex,
       });
     }
 

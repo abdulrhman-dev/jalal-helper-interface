@@ -27,7 +27,7 @@ export default function DuplicateManger() {
 
       setIdentifierState({
         error: '',
-        value: '',
+        value: identifierList[0],
         list: identifierList,
       });
     }

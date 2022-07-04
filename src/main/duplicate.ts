@@ -1,6 +1,10 @@
 /* eslint-disable prettier/prettier */
 import WorkBook from '../lib/WorkBook';
-import { updateDuplicates, findDuplicats } from '../lib/utilities';
+import {
+  updateDuplicates,
+  findDuplicats,
+  updateMergeTarget,
+} from '../lib/utilities';
 
 let workbook: WorkBook | undefined;
 let duplicateObject: object;
@@ -60,20 +64,24 @@ export function deleteDuplicates(currentIndex: number, newIdentfier: string) {
 
   let shiftAmount = 0;
 
+  const rows: any = [];
+
   // eslint-disable-next-line no-plusplus
   for (let i = 1; i < duplicates.length; i++) {
     // eslint-disable-next-line prefer-destructuring
-    const index = duplicates[i].index;
-    sheet.deleteRow(index - shiftAmount);
+    const index = duplicates[i].index - shiftAmount;
+    rows.push(sheet.getRow(index));
+    sheet.deleteRow(index);
     // eslint-disable-next-line no-plusplus
     shiftAmount++;
-    indexArr.push(index);
+    indexArr.push(duplicates[i].index);
   }
 
   sheet.set(identfierKey, newIdentfier, first.index);
-
+  console.log(sheet.headers.map((header) => header.key));
+  updateMergeTarget(sheet, rows, sheet.getRow(first.index));
+  console.log(sheet.headers.map((header) => header.key));
   workbook.save(config.filePath);
-
   if (keys.length === currentIndex + 1) return duplicateObject;
 
   return updateDuplicates(duplicateObject, currentIndex + 1, indexArr);

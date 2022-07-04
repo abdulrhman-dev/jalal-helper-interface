@@ -2,6 +2,7 @@
 /* eslint-disable no-underscore-dangle */
 import * as XLSX from 'xlsx';
 
+// eslint-disable-next-line import/no-cycle
 import WorkSheet from './WorkSheet';
 
 class Workbook {
