@@ -26,6 +26,7 @@ declare global {
     duplicateKey: string;
     identifierKey: string;
     filePath: string | undefined;
+    mergeAll: boolean;
   }
 
   interface DuplicateState {

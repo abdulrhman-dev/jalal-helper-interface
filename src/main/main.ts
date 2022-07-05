@@ -19,6 +19,7 @@ import {
   deleteSingleDuplicate,
   getDuplicateObject,
   getSheets,
+  getWorkBook,
   initialize,
   skipSingleDuplicate,
 } from './duplicate';
@@ -156,6 +157,13 @@ async function registerListeners() {
   });
 
   ipcMain.handle('configure', async (_, config: ClientConfig) => {
+    const sheet = getWorkBook().getSheet(config.sheetName);
+
+    if (!sheet.uniqueHeaders)
+      return {
+        err: 'sheet headers are not unique make sure that the header value are unique then try again.',
+      };
+
     let { filePath } = await dialog.showSaveDialog(mainWindow, {
       filters: [
         {
@@ -172,7 +180,14 @@ async function registerListeners() {
       filePath,
     });
 
-    return getDuplicateObject();
+    const duplicateObject = getDuplicateObject();
+
+    if (duplicateObject.object.length === 0)
+      return {
+        err: 'there is no duplicates in this sheet',
+      };
+
+    return duplicateObject;
   });
 
   ipcMain.handle('delete-duplicate', (_, res: any) => {

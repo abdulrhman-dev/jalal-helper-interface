@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import { useNavigate } from 'react-router-dom';
 import ConfigureSheet from './ConfigureSheet';
 
 function SelectButton({ getData }: { getData: CallableFunction }) {
@@ -16,6 +17,7 @@ function SelectButton({ getData }: { getData: CallableFunction }) {
 
 export default function ConfigurePage() {
   const [sheets, setSheets] = useState([]);
+  const navigate = useNavigate();
 
   async function getData() {
     const wbSheets: ClientSheet[] =
@@ -33,7 +35,12 @@ export default function ConfigurePage() {
       {sheets.length > 0 ? (
         <ConfigureSheet sheets={sheets} />
       ) : (
-        <SelectButton getData={() => getData()} />
+        <Stack>
+          <SelectButton getData={() => getData()} />
+          <Button variant="light" onClick={() => navigate('/')}>
+            Go back
+          </Button>
+        </Stack>
       )}
     </div>
   );

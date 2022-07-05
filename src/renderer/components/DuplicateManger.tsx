@@ -5,6 +5,7 @@ import {
   useDuplicate,
   useSetDuplicate,
 } from 'renderer/providers/DuplicateProvider';
+import CloseIcon from '@mui/icons-material/Close';
 
 export default function DuplicateManger() {
   const { duplicate, currentIndex, total } = useDuplicate();
@@ -17,7 +18,8 @@ export default function DuplicateManger() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (duplicate.length === 0) navigate('/configure', { replace: true });
+    if (duplicate.length === 0)
+      navigate('/configureDuplicates', { replace: true });
     else {
       const keys = Object.keys(duplicate[0]);
 
@@ -27,7 +29,7 @@ export default function DuplicateManger() {
 
       setIdentifierState({
         error: '',
-        value: identifierList[0],
+        value: '',
         list: identifierList,
       });
     }
@@ -54,7 +56,7 @@ export default function DuplicateManger() {
       }>('skip-duplicate', currentIndex);
 
       if (result.object === undefined)
-        navigate('/configure', { replace: true });
+        navigate('/configureDuplicates', { replace: true });
 
       setDuplicate({
         duplicate: result.object,
@@ -80,7 +82,7 @@ export default function DuplicateManger() {
       });
 
       if (result.object === undefined)
-        navigate('/configure', { replace: true });
+        navigate('/configureDuplicates', { replace: true });
 
       setDuplicate({
         duplicate: result.object,
@@ -92,6 +94,11 @@ export default function DuplicateManger() {
     return (
       <div className="container">
         <Stack sx={{ minWidth: 400 }}>
+          <CloseIcon
+            fontSize="small"
+            style={{ marginLeft: 'auto', cursor: 'pointer' }}
+            onClick={() => navigate('/')}
+          />
           <div>
             <Progress
               radius="xs"

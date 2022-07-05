@@ -1,8 +1,16 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Stack, SegmentedControl, Select, Button } from '@mantine/core';
+import {
+  Stack,
+  SegmentedControl,
+  Select,
+  Button,
+  Checkbox,
+  Alert,
+} from '@mantine/core';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useSetDuplicate } from 'renderer/providers/DuplicateProvider';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
   const navigate = useNavigate();
@@ -11,6 +19,8 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
   const [duplicateTarget, setDuplicateTarget] = useState('');
   const [identifierChoices, setIdentifierChoices] = useState([]);
   const [identifier, setIdentifier] = useState('');
+  const [mergeAll, setMergeAll] = useState(false);
+  const [error, setError] = useState('');
 
   const setDuplicate = useSetDuplicate();
 
@@ -54,13 +64,20 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
     const duplicateObj = await window.electron.ipcRenderer.invokeAsync<{
       object: object;
       total: number;
+      err: string | undefined;
     }>('configure', {
       duplicateKey: duplicateTarget,
       identifierKey: identifier,
       sheetName: choosenSheet,
+      mergeAll,
     });
 
-    console.log(duplicateObj);
+    if (duplicateObj.err) {
+      setError(duplicateObj.err);
+      return;
+    }
+
+    setError('');
 
     setDuplicate({
       duplicate: duplicateObj.object,
@@ -81,6 +98,16 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
           value: sheet.name,
         }))}
       />
+      {error !== '' && (
+        <Alert
+          sx={{ width: 250 }}
+          icon={<ErrorOutlineIcon fontSize="small" />}
+          title="An error occured!"
+          color="red"
+        >
+          {error}
+        </Alert>
+      )}
       <Select
         label="Choose the duplicate target"
         placeholder="Pick one"
@@ -95,11 +122,19 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
         onChange={setIdentifier}
         data={identifierChoices}
       />
+      <Checkbox
+        label="Merge all the attributes"
+        checked={mergeAll}
+        onChange={(event) => setMergeAll(event.currentTarget.checked)}
+      />
       <Button
         leftIcon={<SettingsIcon fontSize="small" />}
         onClick={() => configureXLSXfile()}
       >
         Configure
+      </Button>
+      <Button variant="light" onClick={() => navigate('/')}>
+        Go Back
       </Button>
     </Stack>
   );

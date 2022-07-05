@@ -18,6 +18,10 @@ export const initialize = (dir: string) => {
   });
 };
 
+export const getWorkBook = () => {
+  return workbook;
+};
+
 export const getSheets = (): ClientSheet[] => {
   const sheets = workbook.getSheets();
 
@@ -40,7 +44,7 @@ const getClientObject = (index: number) => {
   }));
 };
 
-export const getDuplicateObject = (): object => {
+export const getDuplicateObject = () => {
   if (!config) return { object: [] };
   if (!workbook) return { object: [] };
   const sheet = workbook.getSheet(config.sheetName);
@@ -78,9 +82,15 @@ export function deleteDuplicates(currentIndex: number, newIdentfier: string) {
   }
 
   sheet.set(identfierKey, newIdentfier, first.index);
-  console.log(sheet.headers.map((header) => header.key));
-  updateMergeTarget(sheet, rows, sheet.getRow(first.index));
-  console.log(sheet.headers.map((header) => header.key));
+  if (config.mergeAll) {
+    try {
+      console.log(sheet.headers.map((header) => header.key));
+      updateMergeTarget(sheet, rows, sheet.getRow(first.index));
+      console.log(sheet.headers.map((header) => header.key));
+    } catch (err) {
+      console.log(err?.message);
+    }
+  }
   workbook.save(config.filePath);
   if (keys.length === currentIndex + 1) return duplicateObject;
 

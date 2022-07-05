@@ -3,6 +3,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable import/no-cycle */
 /* eslint-disable no-undef */
+import chalk from 'chalk';
 import * as XLSX from 'xlsx';
 import WorkSheet from './WorkSheet';
 
@@ -159,17 +160,15 @@ function searchAndDeploy(
 
   const [prevHeaderName] = prevHeader.key.split('_');
 
-  if (prevHeaderName === currHeaderName) {
-    const newHeaderName = [currHeaderName, parseInt(currHeaderNumber) + 1].join(
-      '_'
-    );
-    sheet.shiftColumn(currHeaderIndex + 1, 1);
-    sheet.setHeader(
-      [currHeaderName, parseInt(currHeaderNumber) + 1].join('_'),
-      currHeaderIndex + 1
-    );
-    sheet.set(newHeaderName, value, mainIndex);
-  }
+  const newHeaderName = [currHeaderName, parseInt(currHeaderNumber) + 1].join(
+    '_'
+  );
+  sheet.shiftColumn(currHeaderIndex + 1, 1);
+  sheet.setHeader(
+    [currHeaderName, parseInt(currHeaderNumber) + 1].join('_'),
+    currHeaderIndex + 1
+  );
+  sheet.set(newHeaderName, value, mainIndex);
 }
 
 export function updateMergeTarget(
@@ -200,6 +199,7 @@ export function updateMergeTarget(
       if (exists?.value === column.value) continue;
 
       // search and deploy
+      console.log(chalk.red.bold.underline(column.key));
       searchAndDeploy(sheet, column.key, column.value, mainIndex);
     }
   }
