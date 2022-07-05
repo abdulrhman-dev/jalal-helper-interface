@@ -158,8 +158,6 @@ function searchAndDeploy(
 
   if (prevHeader?.key === undefined) return;
 
-  const [prevHeaderName] = prevHeader.key.split('_');
-
   const newHeaderName = [currHeaderName, parseInt(currHeaderNumber) + 1].join(
     '_'
   );
@@ -180,9 +178,8 @@ export function updateMergeTarget(
 
   for (let R = 0; R < rows.length; R++) {
     const row = rows[R];
-    if (row.length === 2) continue;
 
-    for (let C = 2; C < row.length; C++) {
+    for (let C = 0; C < row.length; C++) {
       const column = row[C];
       if (!column.key) continue;
 
@@ -199,7 +196,6 @@ export function updateMergeTarget(
       if (exists?.value === column.value) continue;
 
       // search and deploy
-      console.log(chalk.red.bold.underline(column.key));
       searchAndDeploy(sheet, column.key, column.value, mainIndex);
     }
   }

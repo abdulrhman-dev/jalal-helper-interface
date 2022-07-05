@@ -68,7 +68,7 @@ export function deleteDuplicates(currentIndex: number, newIdentfier: string) {
 
   let shiftAmount = 0;
 
-  const rows: any = [];
+  let rows: ColumnItem[][] = [];
 
   // eslint-disable-next-line no-plusplus
   for (let i = 1; i < duplicates.length; i++) {
@@ -85,6 +85,14 @@ export function deleteDuplicates(currentIndex: number, newIdentfier: string) {
   if (config.mergeAll) {
     try {
       console.log(sheet.headers.map((header) => header.key));
+      rows = rows.map((row) =>
+        row.filter(
+          (item) =>
+            item.key !== config.duplicateKey &&
+            item.key !== config.identifierKey
+        )
+      );
+
       updateMergeTarget(sheet, rows, sheet.getRow(first.index));
       console.log(sheet.headers.map((header) => header.key));
     } catch (err) {

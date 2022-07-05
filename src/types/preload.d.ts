@@ -3,6 +3,9 @@ import { Channels } from '../main/preload';
 declare global {
   interface Window {
     electron: {
+      close: CallableFunction;
+      minimize: CallbackFunction;
+      maximizeToggle: CallbackFunction;
       ipcRenderer: {
         sendMessage(channel: Channels, args?: unknown[]): void;
         invoke(channel: Channels, args?: unknown[]): unknown;

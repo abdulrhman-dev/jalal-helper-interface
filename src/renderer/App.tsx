@@ -1,13 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ConfigurePage from './components/ConfigurePage/ConfigurePage';
-import DuplicateManger from './components/DuplicateManger';
+import ConfigurePage from './pages/ConfigurePage/ConfigurePage';
+import DuplicateManger from './pages/DuplicateManger';
 import AppContextProvider from './providers/AppContextProvider';
 import './App.css';
-import ToolSelector from './components/ToolSelector';
+import ToolSelector from './pages/ToolSelector';
+import TitleBar from './components/TitleBar/Titlebar';
 
 export default function App() {
   return (
     <AppContextProvider>
+      <TitleBar title="Jalal Helper" />
       <BrowserRouter>
         <Routes>
           <Route path="/selector" element={<ToolSelector />} />

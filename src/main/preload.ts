@@ -7,6 +7,9 @@ export type Channels =
   | 'skip-duplicate';
 
 contextBridge.exposeInMainWorld('electron', {
+  close: () => ipcRenderer.send('close-app'),
+  minimize: () => ipcRenderer.send('minimize-app'),
+  maximizeToggle: () => ipcRenderer.send('maximize-toggle'),
   ipcRenderer: {
     sendMessage(channel: Channels, args?: unknown[]) {
       ipcRenderer.send(channel, args);

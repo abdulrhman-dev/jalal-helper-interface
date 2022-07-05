@@ -76,6 +76,7 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    frame: false,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -100,7 +101,17 @@ const createWindow = async () => {
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
+  mainWindow.on('close', async (e) => {
+    e.preventDefault();
+    const { response } = await dialog.showMessageBox(mainWindow, {
+      type: 'question',
+      title: 'Confirm ',
+      message: 'Are you sure that you want to close the application?',
+      buttons: ['Yes', 'No'],
+    });
 
+    if (response === 0) mainWindow.destroy();
+  });
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
@@ -196,6 +207,22 @@ async function registerListeners() {
 
   ipcMain.handle('skip-duplicate', (_, index: number) => {
     return skipSingleDuplicate(index);
+  });
+
+  ipcMain.on('close-app', async (e) => {
+    mainWindow.close();
+  });
+
+  ipcMain.on('maximize-toggle', () => {
+    if (mainWindow.isMaximized()) {
+      mainWindow.restore();
+    } else {
+      mainWindow.maximize();
+    }
+  });
+
+  ipcMain.on('minimize-app', () => {
+    mainWindow.minimize();
   });
 }
 
