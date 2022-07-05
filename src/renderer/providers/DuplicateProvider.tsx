@@ -4,6 +4,7 @@ const intialState = {
   duplicate: [],
   currentIndex: 0,
   total: 0,
+  finishedDuplicate: [],
 };
 
 const DuplicateContext = createContext<DuplicateState>(intialState);

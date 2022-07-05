@@ -19,3 +19,20 @@ body {
     font-weight: bold;
     margin: 0 3px;
 }
+
+/* scroll bar styling  */
+::-webkit-scrollbar{
+    width: 7px;
+}
+
+::-webkit-scrollbar-track{
+    background-color: #f0f0f0;
+}
+
+::-webkit-scrollbar-thumb{
+    background-color: #686868;
+    height: 95px;
+    border-radius: "50%";
+}
+
+

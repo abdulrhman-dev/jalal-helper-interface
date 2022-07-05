@@ -33,6 +33,7 @@ declare global {
     duplicate: any[];
     currentIndex: number;
     total: number;
+    finishedDuplicate: any[];
   }
 
   type CallbackFunction = () => void;

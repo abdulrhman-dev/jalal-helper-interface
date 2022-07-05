@@ -1,4 +1,11 @@
-import { Stack, Table, Progress, Button, Autocomplete } from '@mantine/core';
+import {
+  Stack,
+  Table,
+  Progress,
+  Button,
+  Autocomplete,
+  Checkbox,
+} from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -8,12 +15,13 @@ import {
 import CloseIcon from '@mui/icons-material/Close';
 
 export default function DuplicateManger() {
-  const { duplicate, currentIndex, total } = useDuplicate();
+  const { duplicate, currentIndex, total, finishedDuplicate } = useDuplicate();
   const [identifierState, setIdentifierState] = useState({
     list: [],
     value: '',
     error: '',
   });
+  const [plugDefault, setPlugDefault] = useState(false);
   const setDuplicate = useSetDuplicate();
   const navigate = useNavigate();
 
@@ -29,11 +37,21 @@ export default function DuplicateManger() {
 
       setIdentifierState({
         error: '',
-        value: '',
+        value: plugDefault ? identifierList[0] : '',
         list: identifierList,
       });
     }
-  }, [duplicate, navigate]);
+  }, [duplicate, navigate, plugDefault]);
+
+  const handlePlugDefaultChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setPlugDefault(event.currentTarget.checked);
+    setIdentifierState({
+      ...identifierState,
+      value: event.currentTarget.checked ? identifierState.list[0] : '',
+    });
+  };
 
   if (duplicate.length !== 0) {
     const keys = Object.keys(duplicate[0]);
@@ -52,16 +70,23 @@ export default function DuplicateManger() {
 
     const handleSkipDuplicate = async () => {
       const result = await window.electron.ipcRenderer.invokeAsync<{
-        object: object | undefined;
+        object: object[];
       }>('skip-duplicate', currentIndex);
 
-      if (result.object === undefined)
-        navigate('/configureDuplicates', { replace: true });
+      if (result.object.length === 0)
+        navigate('/duplicateSuccess', { replace: true });
 
       setDuplicate({
         duplicate: result.object,
         currentIndex: currentIndex + 1,
         total,
+        finishedDuplicate: [
+          ...finishedDuplicate,
+          {
+            name: duplicate[0][keys[0]],
+            type: 'skipped',
+          },
+        ],
       });
     };
 
@@ -75,19 +100,26 @@ export default function DuplicateManger() {
       }
 
       const result = await window.electron.ipcRenderer.invokeAsync<{
-        object: object | undefined;
+        object: object[];
       }>('delete-duplicate', {
         index: currentIndex,
         newIdentfier: identifierState.value,
       });
 
-      if (result.object === undefined)
-        navigate('/configureDuplicates', { replace: true });
+      if (result.object.length === 0)
+        navigate('/duplicateSuccess', { replace: true });
 
       setDuplicate({
         duplicate: result.object,
         currentIndex: currentIndex + 1,
         total,
+        finishedDuplicate: [
+          ...finishedDuplicate,
+          {
+            name: duplicate[0][keys[0]],
+            type: 'merged',
+          },
+        ],
       });
     };
 
@@ -97,7 +129,7 @@ export default function DuplicateManger() {
           <CloseIcon
             fontSize="small"
             style={{ marginLeft: 'auto', cursor: 'pointer' }}
-            onClick={() => navigate('/configureDuplicates')}
+            onClick={() => navigate('/')}
           />
           <div>
             <Progress
@@ -121,6 +153,11 @@ export default function DuplicateManger() {
               setIdentifierState({ ...identifierState, value: e })
             }
             data={identifierState.list}
+          />
+          <Checkbox
+            label="Plug the first identifier by default"
+            checked={plugDefault}
+            onChange={handlePlugDefaultChange}
           />
           <Button onClick={handleMergeDuplicate}>Merge</Button>
           <Button onClick={handleSkipDuplicate} variant="light">

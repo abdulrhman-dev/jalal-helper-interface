@@ -89,6 +89,7 @@ export default function ConfigureSheet({
       duplicate: duplicateObj.object,
       total: duplicateObj.total,
       currentIndex: 0,
+      finishedDuplicate: [],
     });
 
     navigate('/duplicates', { replace: true });
