@@ -184,16 +184,25 @@ export function updateMergeTarget(
       if (!column.key) continue;
 
       const mainTarget = sheet.getRow(mainIndex);
-      const exists = mainTarget.find(
+      const keyExists = mainTarget.find(
         (mainColumn) => mainColumn.key === column.key
       );
 
-      if (!exists) {
+      if (!keyExists) {
         sheet.set(column.key, column.value, mainIndex);
         continue;
       }
 
-      if (exists?.value === column.value) continue;
+      if (keyExists?.value === column.value) continue;
+
+      const valueExists = mainTarget.find((mainColumn) => {
+        const [mainName] = mainColumn.key.split('_');
+        const [columnName] = column.key.split('_');
+
+        return mainColumn.value === column.value && mainName === columnName;
+      });
+
+      if (valueExists) continue;
 
       // search and deploy
       searchAndDeploy(sheet, column.key, column.value, mainIndex);

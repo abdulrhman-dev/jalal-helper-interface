@@ -1,6 +1,6 @@
 import { Group, ThemeIcon } from '@mantine/core';
 import { Link } from 'react-router-dom';
-import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
 
 export default function ToolSelector() {
   return (
@@ -18,14 +18,14 @@ export default function ToolSelector() {
           <Link to="/configureDuplicates">
             <ThemeIcon
               variant="light"
-              color="red"
+              color="blue"
               size={100}
               sx={{ borderRadius: '50%', cursor: 'pointer' }}
             >
-              <ContentCopyIcon fontSize="medium" />
+              <ManageSearchOutlinedIcon fontSize="large" />
             </ThemeIcon>
           </Link>
-          <h3>Duplicate manger</h3>
+          <h3>Duplicate manager</h3>
         </div>
       </Group>
     </div>

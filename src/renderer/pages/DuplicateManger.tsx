@@ -97,7 +97,7 @@ export default function DuplicateManger() {
           <CloseIcon
             fontSize="small"
             style={{ marginLeft: 'auto', cursor: 'pointer' }}
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/configureDuplicates')}
           />
           <div>
             <Progress

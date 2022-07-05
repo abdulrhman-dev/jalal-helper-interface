@@ -74,8 +74,10 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    minWidth: 500,
+    minHeight: 600,
+    width: 700,
+    height: 800,
     frame: false,
     icon: getAssetPath('icon.png'),
     webPreferences: {
@@ -172,7 +174,7 @@ async function registerListeners() {
 
     if (!sheet.uniqueHeaders)
       return {
-        err: 'sheet headers are not unique make sure that the header value are unique then try again.',
+        err: 'Sheet headers are not unique make sure that the header value are unique then try again.',
       };
 
     let { filePath } = await dialog.showSaveDialog(mainWindow, {
@@ -195,7 +197,7 @@ async function registerListeners() {
 
     if (duplicateObject.object.length === 0)
       return {
-        err: 'there is no duplicates in this sheet',
+        err: 'There is no duplicates in this sheet',
       };
 
     return duplicateObject;
