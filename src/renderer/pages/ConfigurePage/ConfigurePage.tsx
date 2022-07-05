@@ -30,10 +30,14 @@ export default function ConfigurePage() {
     setSheets(wbSheets);
   }
 
+  function goBack() {
+    setSheets([]);
+  }
+
   return (
     <div className="container">
       {sheets.length > 0 ? (
-        <ConfigureSheet sheets={sheets} />
+        <ConfigureSheet sheets={sheets} goBack={() => goBack()} />
       ) : (
         <Stack>
           <SelectButton getData={() => getData()} />

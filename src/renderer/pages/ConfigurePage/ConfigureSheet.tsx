@@ -12,7 +12,13 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { useSetDuplicate } from 'renderer/providers/DuplicateProvider';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
-export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
+export default function ConfigureSheet({
+  sheets,
+  goBack,
+}: {
+  sheets: ClientSheet[];
+  goBack: CallableFunction;
+}) {
   const navigate = useNavigate();
   const [choosenSheet, setChoosenSheet] = useState('');
   const [duplicateChoices, setDuplicateChoices] = useState([]);
@@ -133,7 +139,7 @@ export default function ConfigureSheet({ sheets }: { sheets: ClientSheet[] }) {
       >
         Configure
       </Button>
-      <Button variant="light" onClick={() => navigate('/')}>
+      <Button variant="light" onClick={() => goBack()}>
         Go Back
       </Button>
     </Stack>
