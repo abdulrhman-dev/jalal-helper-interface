@@ -1,3 +1,4 @@
+/* eslint-disable import/newline-after-import */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
 /**
@@ -12,18 +13,8 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import * as XLSX from 'xlsx';
 import { resolveHtmlPath } from './util';
-import {
-  configure,
-  deleteSingleDuplicate,
-  getDuplicateObject,
-  getSheets,
-  getWorkBook,
-  initialize,
-  skipSingleDuplicate,
-} from './duplicate';
-
+import duplicateHandler from './handlers/duplicateHandler';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -141,75 +132,7 @@ async function registerListeners() {
   /**
    * This comes from bridge integration, check bridge.ts
    */
-
-  ipcMain.handle('get-data-xlsx', async (): Promise<XLSX.WorkBook> => {
-    if (mainWindow === null) return;
-
-    try {
-      const { filePaths } = await dialog.showOpenDialog(mainWindow, {
-        filters: [
-          {
-            name: 'XLSX File',
-            extensions: ['xlsx'],
-          },
-        ],
-        properties: ['openFile'],
-      });
-
-      const dir: string | undefined = filePaths[0];
-
-      if (dir) {
-        initialize(dir);
-
-        // eslint-disable-next-line consistent-return
-        return getSheets();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  });
-
-  ipcMain.handle('configure', async (_, config: ClientConfig) => {
-    const sheet = getWorkBook().getSheet(config.sheetName);
-
-    if (!sheet.uniqueHeaders)
-      return {
-        err: 'Sheet headers are not unique make sure that the header value are unique then try again.',
-      };
-
-    let { filePath } = await dialog.showSaveDialog(mainWindow, {
-      filters: [
-        {
-          name: 'XLSX File',
-          extensions: ['xlsx'],
-        },
-      ],
-    });
-
-    if (filePath === '') filePath = undefined;
-
-    configure({
-      ...config,
-      filePath,
-    });
-
-    const duplicateObject = getDuplicateObject();
-
-    if (duplicateObject.object.length === 0)
-      return {
-        err: 'There is no duplicates in this sheet',
-      };
-
-    return duplicateObject;
-  });
-
-  ipcMain.handle('delete-duplicate', (_, res: any) => {
-    return deleteSingleDuplicate(res.index, res.newIdentfier);
-  });
-
-  ipcMain.handle('skip-duplicate', (_, index: number) => {
-    return skipSingleDuplicate(index);
-  });
+  duplicateHandler();
 
   ipcMain.on('close-app', async (e) => {
     mainWindow.close();
@@ -240,3 +163,6 @@ app
     });
   })
   .catch(console.log);
+
+// eslint-disable-next-line import/prefer-default-export
+export const getMainWindow = () => mainWindow;

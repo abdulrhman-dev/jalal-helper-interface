@@ -71,7 +71,7 @@ export default function ConfigureSheet({
       object: object;
       total: number;
       err: string | undefined;
-    }>('configure', {
+    }>('configure-duplicate', {
       duplicateKey: duplicateTarget,
       identifierKey: identifier,
       sheetName: choosenSheet,

@@ -8,7 +8,7 @@ import {
 
 let workbook: WorkBook | undefined;
 let duplicateObject: object;
-let config: ClientConfig;
+let config: DuplicateClientConfig;
 
 export const initialize = (dir: string) => {
   workbook = new WorkBook(dir, {
@@ -22,13 +22,13 @@ export const getWorkBook = () => {
   return workbook;
 };
 
-export const getSheets = (): ClientSheet[] => {
+export const getSheets = () => {
   const sheets = workbook.getSheets();
 
   return sheets.map((sheet) => ({ name: sheet.name, headers: sheet.headers }));
 };
 
-export const configure = (value: ClientConfig) => {
+export const configure = (value: DuplicateClientConfig) => {
   config = value;
 };
 

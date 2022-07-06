@@ -154,7 +154,7 @@ class WorkSheet {
     });
   }
 
-  setHeader(value: string, column: number) {
+  setHeader(value: string, column: number, overwrite = false) {
     const match = this.headers.find(
       (header, index) => header.key === value && index !== column
     );
@@ -169,6 +169,11 @@ class WorkSheet {
       position,
       data: { t: 's', v: value },
     };
+
+    if (overwrite && column < this.headers.length) {
+      this.headers[column] = header;
+      return;
+    }
 
     this.headers.push(header);
   }

@@ -21,12 +21,18 @@ declare global {
     headers: Header[];
   }
 
-  interface ClientConfig {
+  interface DuplicateClientConfig {
     sheetName: string;
     duplicateKey: string;
     identifierKey: string;
     filePath: string | undefined;
     mergeAll: boolean;
+  }
+
+  interface PhoneClientConfig {
+    sheetName: string;
+    phoneTarget: string;
+    savePath: string;
   }
 
   interface DuplicateState {

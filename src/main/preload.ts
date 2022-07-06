@@ -1,8 +1,8 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
-  | 'get-data-xlsx'
-  | 'configure'
+  | 'get-data-duplicate'
+  | 'configure-duplicate'
   | 'delete-duplicate'
   | 'skip-duplicate';
 

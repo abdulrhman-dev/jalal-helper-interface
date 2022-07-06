@@ -22,7 +22,7 @@ export default function ConfigurePage() {
   async function getData() {
     const wbSheets: ClientSheet[] =
       await window.electron.ipcRenderer.invokeAsync<ClientSheet[]>(
-        'get-data-xlsx'
+        'get-data-duplicate'
       );
 
     if (!wbSheets) return;
