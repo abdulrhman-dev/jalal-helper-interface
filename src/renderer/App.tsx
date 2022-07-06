@@ -1,11 +1,13 @@
 import './App.css';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ConfigurePage from './pages/ConfigurePage/ConfigurePage';
-import DuplicateManger from './pages/DuplicateManger';
+import TitleBar from './components/TitleBar/Titlebar';
+import ConfigurePage from './pages/DuplicateManger/DuplicateConfigurePage';
+import DuplicateManger from './pages/DuplicateManger/DuplicateManger';
 import AppContextProvider from './providers/AppContextProvider';
 import ToolSelector from './pages/ToolSelector';
-import TitleBar from './components/TitleBar/Titlebar';
-import DuplicateSuccess from './pages/DuplicateSuccess';
+import DuplicateSuccess from './pages/DuplicateManger/DuplicateSuccess';
+import PhoneConfigurePage from './pages/PhoneAppend/PhoneConfigurePage';
+import PhoneSuccess from './pages/PhoneAppend/PhoneSuccess';
 
 export default function App() {
   return (
@@ -13,10 +15,16 @@ export default function App() {
       <TitleBar title="Jalal Helper" />
       <BrowserRouter>
         <Routes>
+          <Route path="duplicate">
+            <Route path="configure" element={<ConfigurePage />} />
+            <Route path="value" element={<DuplicateManger />} />
+            <Route path="success" element={<DuplicateSuccess />} />
+          </Route>
+          <Route path="phone">
+            <Route path="configure" element={<PhoneConfigurePage />} />
+            <Route path="success" element={<PhoneSuccess />} />
+          </Route>
           <Route path="/selector" element={<ToolSelector />} />
-          <Route path="/configureDuplicates" element={<ConfigurePage />} />
-          <Route path="/duplicates" element={<DuplicateManger />} />
-          <Route path="/duplicateSuccess" element={<DuplicateSuccess />} />
           <Route path="*" element={<Navigate to="/selector" />} />
         </Routes>
       </BrowserRouter>

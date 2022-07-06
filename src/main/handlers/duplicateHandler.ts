@@ -1,5 +1,5 @@
 /* eslint-disable import/no-cycle */
-import { BrowserWindow, ipcMain, dialog } from 'electron';
+import { ipcMain, dialog } from 'electron';
 import {
   configure,
   deleteSingleDuplicate,
@@ -12,7 +12,7 @@ import {
 import { getMainWindow } from '../main';
 
 export default () => {
-  ipcMain.handle('get-data-duplicate', async () => {
+  ipcMain.handle('initialize-duplicate', async () => {
     const mainWindow = getMainWindow();
     if (mainWindow === null) return;
 

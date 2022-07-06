@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable import/newline-after-import */
 /* eslint global-require: off, no-console: off, promise/always-return: off */
 
@@ -15,6 +16,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import { resolveHtmlPath } from './util';
 import duplicateHandler from './handlers/duplicateHandler';
+import phoneHandler from './handlers/phoneHandler';
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -133,6 +135,7 @@ async function registerListeners() {
    * This comes from bridge integration, check bridge.ts
    */
   duplicateHandler();
+  phoneHandler();
 
   ipcMain.on('close-app', async (e) => {
     mainWindow.close();

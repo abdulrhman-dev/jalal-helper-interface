@@ -35,11 +35,20 @@ declare global {
     savePath: string;
   }
 
+  interface PreventedPhones {
+    number: string;
+    index: number;
+  }
+
   interface DuplicateState {
     duplicate: any[];
     currentIndex: number;
     total: number;
     finishedDuplicate: any[];
+  }
+
+  interface PhoneState {
+    phoneResult: PreventedPhones[];
   }
 
   type CallbackFunction = () => void;

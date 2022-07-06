@@ -1,4 +1,5 @@
 import DuplicateProvider from './DuplicateProvider';
+import PhoneProvider from './PhoneProvider';
 
 const combineComponents = (...components) => {
   return components.reduce(
@@ -16,6 +17,6 @@ const combineComponents = (...components) => {
 };
 
 // Providers
-const providers = [DuplicateProvider];
+const providers = [DuplicateProvider, PhoneProvider];
 
 export default combineComponents(...providers);

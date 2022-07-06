@@ -27,7 +27,7 @@ export default function DuplicateManger() {
 
   useEffect(() => {
     if (duplicate.length === 0)
-      navigate('/configureDuplicates', { replace: true });
+      navigate('/duplicate/configure', { replace: true });
     else {
       const keys = Object.keys(duplicate[0]);
 
@@ -74,7 +74,7 @@ export default function DuplicateManger() {
       }>('skip-duplicate', currentIndex);
 
       if (result.object.length === 0)
-        navigate('/duplicateSuccess', { replace: true });
+        navigate('/duplicate/success', { replace: true });
 
       setDuplicate({
         duplicate: result.object,
@@ -107,7 +107,7 @@ export default function DuplicateManger() {
       });
 
       if (result.object.length === 0)
-        navigate('/duplicateSuccess', { replace: true });
+        navigate('/duplicate/success', { replace: true });
 
       setDuplicate({
         duplicate: result.object,

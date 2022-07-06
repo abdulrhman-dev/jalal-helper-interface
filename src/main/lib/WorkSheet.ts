@@ -1,9 +1,9 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-plusplus */
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 import * as XLSX from 'xlsx';
-// eslint-disable-next-line import/no-cycle
 import { deleteRowUtility, getType, ec } from './utilities';
 
 class WorkSheet {
@@ -197,6 +197,7 @@ class WorkSheet {
     this.insertCell(cell, {
       t: getType(value),
       v: value,
+      w: String(value),
     });
   }
 
@@ -228,6 +229,7 @@ class WorkSheet {
   getColumn(key: string, ignoreEmpty = true) {
     if (!this.uniqueHeaders)
       throw new Error('Header must be unique to use this method');
+    console.log(key);
     const header = this.headers.find((headerItem) => headerItem.key === key);
     if (!header) throw new Error('Passed key is not in the headers');
 

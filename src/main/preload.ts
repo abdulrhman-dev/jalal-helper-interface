@@ -1,10 +1,12 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
 export type Channels =
-  | 'get-data-duplicate'
+  | 'initialize-duplicate'
   | 'configure-duplicate'
   | 'delete-duplicate'
-  | 'skip-duplicate';
+  | 'skip-duplicate'
+  | 'initialize-phone'
+  | 'configure-phone';
 
 contextBridge.exposeInMainWorld('electron', {
   close: () => ipcRenderer.send('close-app'),

@@ -92,7 +92,7 @@ export default function ConfigureSheet({
       finishedDuplicate: [],
     });
 
-    navigate('/duplicates', { replace: true });
+    navigate('/duplicate/value', { replace: true });
   };
 
   return (

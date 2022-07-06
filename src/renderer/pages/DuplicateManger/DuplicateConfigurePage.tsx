@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Stack } from '@mantine/core';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useNavigate } from 'react-router-dom';
-import ConfigureSheet from './ConfigureSheet';
+import ConfigureSheet from './DuplicateConfigureSheet';
 
 function SelectButton({ getData }: { getData: CallableFunction }) {
   return (
@@ -22,7 +22,7 @@ export default function ConfigurePage() {
   async function getData() {
     const wbSheets: ClientSheet[] =
       await window.electron.ipcRenderer.invokeAsync<ClientSheet[]>(
-        'get-data-duplicate'
+        'initialize-duplicate'
       );
 
     if (!wbSheets) return;

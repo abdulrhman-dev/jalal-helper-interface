@@ -1,8 +1,19 @@
-import { Group, ThemeIcon } from '@mantine/core';
+import { DefaultMantineColor, Group, ThemeIcon } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import ManageSearchOutlinedIcon from '@mui/icons-material/ManageSearchOutlined';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 
-function ToolSelectorItem({ title, color, icon, link }) {
+function ToolSelectorItem({
+  title,
+  color,
+  icon,
+  link,
+}: {
+  color: DefaultMantineColor;
+  link: string;
+  title: string;
+  icon: JSX.Element;
+}) {
   return (
     <div
       style={{
@@ -33,10 +44,16 @@ export default function ToolSelector() {
     <div className="container">
       <Group position="center">
         <ToolSelectorItem
-          link="/configureDuplicates"
+          link="/duplicate/configure"
           title="Duplicate manager"
-          color="blue"
+          color="cyan"
           icon={<ManageSearchOutlinedIcon fontSize="large" />}
+        />
+        <ToolSelectorItem
+          link="/phone/configure"
+          title="Egyptian Phone Code"
+          color="orange"
+          icon={<LocalPhoneIcon fontSize="large" />}
         />
       </Group>
     </div>

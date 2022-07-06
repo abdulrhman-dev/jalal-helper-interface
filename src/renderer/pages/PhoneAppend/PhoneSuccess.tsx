@@ -1,42 +1,44 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Stack, List, ThemeIcon, Title, Button, Text } from '@mantine/core';
-import { useDuplicate } from 'renderer/providers/DuplicateProvider';
 import { CircleCheck, CircleX } from 'tabler-icons-react';
 import { useEffect } from 'react';
+import { usePhone } from 'renderer/providers/PhoneProvider';
 
 function Item({ index, name, success }) {
   return (
     <List.Item
       icon={
         !success ? (
-          <ThemeIcon color="gray" variant="light" radius="xl">
+          <ThemeIcon color="red" variant="filled" radius="xl">
             <CircleX size={20} />
           </ThemeIcon>
         ) : undefined
       }
     >
-      [ {index + 1} ] {success ? 'Merged' : 'Skipped'} {name}
+      [ {index + 1} ] {success ? 'Changed' : 'Prevented'} {name}
     </List.Item>
   );
 }
 
-export default function DuplicateSuccess() {
-  const { finishedDuplicate } = useDuplicate();
+export default function PhoneSuccess() {
+  const { phoneResult } = usePhone();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (finishedDuplicate.length === 0) navigate('/configureDuplicates');
-  }, [finishedDuplicate, navigate]);
+    if (phoneResult.length === 0) navigate('/duplicate/configure');
+  }, [phoneResult, navigate]);
+
+  console.log(phoneResult);
 
   return (
     <div className="container">
       <Stack
         sx={{
-          width: 350,
+          width: 400,
         }}
       >
         <Title order={1}>
-          Finised the merging
+          Finised the Append
           <Text color="green" inherit component="span">
             {' Successfully'}
           </Text>
@@ -47,6 +49,7 @@ export default function DuplicateSuccess() {
           sx={{
             fontWeight: 'bold',
             overflowY: 'scroll',
+            width: 400,
             height: 350,
           }}
           center
@@ -56,15 +59,11 @@ export default function DuplicateSuccess() {
             </ThemeIcon>
           }
         >
-          {finishedDuplicate.map((item, index) => (
-            <Item
-              index={index}
-              name={item.name}
-              success={item.type === 'merged'}
-            />
+          {phoneResult.map((item) => (
+            <Item index={item.index} name={`${item.number}`} success={false} />
           ))}
         </List>
-        <Link to="/configureDuplicates">
+        <Link to="/phone/configure">
           <Button
             sx={{ width: 350, marginTop: 20 }}
             variant="light"
