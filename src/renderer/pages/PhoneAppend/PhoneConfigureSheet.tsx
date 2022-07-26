@@ -3,13 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import {
   Stack,
   SegmentedControl,
-  Select,
   Button,
-  Checkbox,
+  MultiSelect,
   Alert,
 } from '@mantine/core';
-import SettingsIcon from '@mui/icons-material/Settings';
-import { useSetDuplicate } from 'renderer/providers/DuplicateProvider';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useSetPhone } from 'renderer/providers/PhoneProvider';
@@ -24,7 +21,7 @@ export default function PhoneConfigureSheet({
   const navigate = useNavigate();
   const setPhone = useSetPhone();
   const [choosenSheet, setChoosenSheet] = useState(sheets[0].name);
-  const [targetHeader, setTargetHeader] = useState('');
+  const [targetHeaders, setTargetHeaders] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [error, setError] = useState('');
 
@@ -34,26 +31,24 @@ export default function PhoneConfigureSheet({
         .find((sheet) => sheet.name === choosenSheet)
         .headers.map((header) => header.key);
       setHeaders(sheetHeaders);
-      setTargetHeader(sheetHeaders[0]);
     }
   }, [sheets, choosenSheet]);
 
   const exportFile = async () => {
-    type Result = PreventedPhones[] | { err: string };
+    if (targetHeaders.length === 0) return;
 
+    type Result = PreventedPhones[] | { err: string };
     const result = await window.electron.ipcRenderer.invokeAsync<Result>(
       'configure-phone',
       {
         sheetName: choosenSheet,
-        phoneTarget: targetHeader,
+        phoneTargets: targetHeaders,
       }
     );
-
     if (!Array.isArray(result)) {
       if (result.err) setError(result.err);
       return;
     }
-
     setError('');
     setPhone({ phoneResult: result });
     navigate('/phone/success');
@@ -78,12 +73,15 @@ export default function PhoneConfigureSheet({
           {error}
         </Alert>
       )}
-      <Select
-        label="Choose Phone Header to add country code"
-        placeholder="Pick one"
-        value={targetHeader}
-        onChange={setTargetHeader}
+      <MultiSelect
         data={headers}
+        label="Choose Phone Header to add country code"
+        placeholder="Pick all that you like"
+        value={targetHeaders}
+        onChange={(value) => setTargetHeaders(value)}
+        clearButtonLabel="Clear selection"
+        clearable
+        sx={{ width: 300 }}
       />
       <Button
         leftIcon={<InsertDriveFileIcon fontSize="small" />}

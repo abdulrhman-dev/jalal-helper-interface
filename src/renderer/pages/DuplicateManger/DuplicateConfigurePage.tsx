@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Button, Stack } from '@mantine/core';
+import { Button, Stack, Alert } from '@mantine/core';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { useNavigate } from 'react-router-dom';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ConfigureSheet from './DuplicateConfigureSheet';
 
 function SelectButton({ getData }: { getData: CallableFunction }) {
@@ -10,24 +11,31 @@ function SelectButton({ getData }: { getData: CallableFunction }) {
       leftIcon={<InsertDriveFileIcon fontSize="small" />}
       onClick={() => getData()}
     >
-      Choose an <span className="bolded">XLSX</span> file
+      Choose an <span className="bolded">XLSX/CSV</span> file
     </Button>
   );
 }
 
 export default function ConfigurePage() {
   const [sheets, setSheets] = useState([]);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
   async function getData() {
-    const wbSheets: ClientSheet[] =
-      await window.electron.ipcRenderer.invokeAsync<ClientSheet[]>(
+    type ReturnType = ClientSheet[] | { err: string };
+
+    const wbSheets: ReturnType =
+      await window.electron.ipcRenderer.invokeAsync<ReturnType>(
         'initialize-duplicate'
       );
 
     if (!wbSheets) return;
 
-    setSheets(wbSheets);
+    setError('');
+
+    if (!Array.isArray(wbSheets)) {
+      if (wbSheets.err) setError(wbSheets.err);
+    } else setSheets(wbSheets);
   }
 
   function goBack() {
@@ -40,6 +48,16 @@ export default function ConfigurePage() {
         <ConfigureSheet sheets={sheets} goBack={() => goBack()} />
       ) : (
         <Stack>
+          {error !== '' && (
+            <Alert
+              sx={{ width: 250 }}
+              icon={<ErrorOutlineIcon fontSize="small" />}
+              title="An error occured!"
+              color="red"
+            >
+              {error}
+            </Alert>
+          )}
           <SelectButton getData={() => getData()} />
           <Button variant="light" onClick={() => navigate('/')}>
             Go back

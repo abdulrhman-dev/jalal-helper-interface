@@ -25,7 +25,7 @@ export default function PhoneSuccess() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (phoneResult.length === 0) navigate('/duplicate/configure');
+    if (phoneResult.length === 0) navigate('/phone/configure');
   }, [phoneResult, navigate]);
 
   console.log(phoneResult);

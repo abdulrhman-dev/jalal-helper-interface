@@ -27,7 +27,7 @@ export const getWorkBook = () => {
   return workbook;
 };
 
-export function changePhone(): PreventedPhones[] {
+export function changePhone(phoneTarget): PreventedPhones[] {
   const result: PreventedPhones[] = [];
   const sheet = workbook.getSheet(config.sheetName);
 
@@ -36,7 +36,7 @@ export function changePhone(): PreventedPhones[] {
   );
 
   for (let i = 0; i < sheet.dataRowNumber; i++) {
-    const value = sheet.get(config.phoneTarget, i);
+    const value = sheet.get(phoneTarget, i);
 
     if (!value) continue;
 
@@ -80,7 +80,7 @@ export function changePhone(): PreventedPhones[] {
       });
 
       const newNumbers = numbers.join(' ::: ');
-      sheet.set(config.phoneTarget, newNumbers, i);
+      sheet.set(phoneTarget, newNumbers, i);
       continue;
     }
 
@@ -93,4 +93,16 @@ export function changePhone(): PreventedPhones[] {
   workbook.save(config.savePath);
 
   return result;
+}
+
+export function changePhones() {
+  const preventedList = [];
+
+  config.phoneTargets.forEach((phoneTarget) => {
+    const result = changePhone(phoneTarget);
+    if (result.length === 0) return;
+    preventedList.push(result);
+  });
+
+  return preventedList;
 }

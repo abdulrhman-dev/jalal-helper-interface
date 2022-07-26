@@ -31,7 +31,7 @@ declare global {
 
   interface PhoneClientConfig {
     sheetName: string;
-    phoneTarget: string;
+    phoneTargets: string[];
     savePath: string;
   }
 

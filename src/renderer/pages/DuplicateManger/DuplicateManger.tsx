@@ -5,6 +5,7 @@ import {
   Button,
   Autocomplete,
   Checkbox,
+  Alert,
 } from '@mantine/core';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ import {
   useSetDuplicate,
 } from 'renderer/providers/DuplicateProvider';
 import CloseIcon from '@mui/icons-material/Close';
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 export default function DuplicateManger() {
   const { duplicate, currentIndex, total, finishedDuplicate } = useDuplicate();
@@ -22,6 +24,7 @@ export default function DuplicateManger() {
     error: '',
   });
   const [plugDefault, setPlugDefault] = useState(false);
+  const [error, setError] = useState('');
   const setDuplicate = useSetDuplicate();
   const navigate = useNavigate();
 
@@ -32,7 +35,7 @@ export default function DuplicateManger() {
       const keys = Object.keys(duplicate[0]);
 
       const identifierList = [
-        ...new Set(duplicate.map((item) => item[keys[0]])),
+        ...new Set(duplicate.map((item) => String(item[keys[0]]))),
       ];
 
       setIdentifierState({
@@ -71,10 +74,13 @@ export default function DuplicateManger() {
     const handleSkipDuplicate = async () => {
       const result = await window.electron.ipcRenderer.invokeAsync<{
         object: object[];
+        err: string | undefined;
       }>('skip-duplicate', currentIndex);
 
       if (result.object.length === 0)
         navigate('/duplicate/success', { replace: true });
+
+      if (result.err) setError(result.err);
 
       setDuplicate({
         duplicate: result.object,
@@ -101,6 +107,7 @@ export default function DuplicateManger() {
 
       const result = await window.electron.ipcRenderer.invokeAsync<{
         object: object[];
+        err: string | undefined;
       }>('delete-duplicate', {
         index: currentIndex,
         newIdentfier: identifierState.value,
@@ -108,6 +115,8 @@ export default function DuplicateManger() {
 
       if (result.object.length === 0)
         navigate('/duplicate/success', { replace: true });
+
+      if (result.err) setError(result.err);
 
       setDuplicate({
         duplicate: result.object,
@@ -138,6 +147,16 @@ export default function DuplicateManger() {
               value={((currentIndex + 1) / total) * 100}
             />
           </div>
+          {error !== '' && (
+            <Alert
+              sx={{ width: 250 }}
+              icon={<ErrorOutlineIcon fontSize="small" />}
+              title="An error occured!"
+              color="red"
+            >
+              {error}
+            </Alert>
+          )}
           <Table>
             <thead>
               <tr>{header}</tr>

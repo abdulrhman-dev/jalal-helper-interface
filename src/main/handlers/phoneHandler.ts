@@ -5,7 +5,7 @@ import {
   getSheets,
   configure,
   getWorkBook,
-  changePhone,
+  changePhones,
 } from '../tools/phone';
 import { getMainWindow } from '../main';
 
@@ -45,7 +45,7 @@ export default () => {
       return {
         err: 'Sheet headers are not unique make sure that the header value are unique then try again.',
       };
-    let { filePath } = await dialog.showSaveDialog(mainWindow, {
+    const { filePath } = await dialog.showSaveDialog(mainWindow, {
       filters: [
         {
           name: 'XLSX File',
@@ -58,13 +58,15 @@ export default () => {
       ],
     });
 
-    if (filePath === '') filePath = undefined;
+    if (filePath === '' || filePath === undefined)
+      return {
+        err: 'You must choose a save location',
+      };
 
     configure({
       ...config,
       savePath: filePath,
     });
-    // TODO: add the function that adds the phone code
-    return changePhone();
+    return changePhones();
   });
 };

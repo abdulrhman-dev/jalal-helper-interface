@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable import/no-cycle */
 import { ipcMain, dialog } from 'electron';
 import {
@@ -36,8 +37,19 @@ export default () => {
       if (dir) {
         initialize(dir);
 
+        const workbookSheets = getSheets();
+
+        for (let i = 0; i < workbookSheets.length; i++) {
+          const sheet = workbookSheets[i];
+
+          // eslint-disable-next-line consistent-return
+          if (sheet.headers.length > 1) return workbookSheets;
+        }
+
         // eslint-disable-next-line consistent-return
-        return getSheets();
+        return {
+          err: 'To use this tool you need to have at least two headers',
+        };
       }
     } catch (err) {
       // eslint-disable-next-line consistent-return
@@ -56,7 +68,7 @@ export default () => {
           err: 'Sheet headers are not unique make sure that the header value are unique then try again.',
         };
 
-      let { filePath } = await dialog.showSaveDialog(mainWindow, {
+      const { filePath } = await dialog.showSaveDialog(mainWindow, {
         filters: [
           {
             name: 'XLSX File',
@@ -69,7 +81,10 @@ export default () => {
         ],
       });
 
-      if (filePath === '') filePath = undefined;
+      if (filePath === '' || filePath === undefined)
+        return {
+          err: 'You must choose a save location',
+        };
 
       configure({
         ...config,
@@ -88,10 +103,18 @@ export default () => {
   );
 
   ipcMain.handle('delete-duplicate', (_, res: any) => {
-    return deleteSingleDuplicate(res.index, res.newIdentfier);
+    try {
+      return deleteSingleDuplicate(res.index, res.newIdentfier);
+    } catch (err) {
+      return { err: err.message };
+    }
   });
 
   ipcMain.handle('skip-duplicate', (_, index: number) => {
-    return skipSingleDuplicate(index);
+    try {
+      return skipSingleDuplicate(index);
+    } catch (err) {
+      return { err: err.message };
+    }
   });
 };
