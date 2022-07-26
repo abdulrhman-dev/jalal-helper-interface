@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TitleBar from './components/TitleBar/Titlebar';
 import ConfigurePage from './pages/DuplicateManger/DuplicateConfigurePage';
 import DuplicateManger from './pages/DuplicateManger/DuplicateManger';
@@ -13,7 +13,7 @@ export default function App() {
   return (
     <AppContextProvider>
       <TitleBar title="Jalal Helper" />
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="duplicate">
             <Route path="configure" element={<ConfigurePage />} />
@@ -27,7 +27,7 @@ export default function App() {
           <Route path="/selector" element={<ToolSelector />} />
           <Route path="*" element={<Navigate to="/selector" />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </AppContextProvider>
   );
 }

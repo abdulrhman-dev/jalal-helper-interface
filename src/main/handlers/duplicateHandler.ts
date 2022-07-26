@@ -23,6 +23,10 @@ export default () => {
             name: 'XLSX File',
             extensions: ['xlsx'],
           },
+          {
+            name: 'CSV File',
+            extensions: ['csv'],
+          },
         ],
         properties: ['openFile'],
       });
@@ -36,6 +40,7 @@ export default () => {
         return getSheets();
       }
     } catch (err) {
+      // eslint-disable-next-line consistent-return
       console.log(err);
     }
   });
@@ -56,6 +61,10 @@ export default () => {
           {
             name: 'XLSX File',
             extensions: ['xlsx'],
+          },
+          {
+            name: 'CSV File',
+            extensions: ['csv'],
           },
         ],
       });
