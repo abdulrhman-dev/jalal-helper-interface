@@ -29,7 +29,7 @@ export default () => {
       });
       const dir: string | undefined = filePaths[0];
       if (dir) {
-        initialize(dir);
+        await initialize(dir);
         // eslint-disable-next-line consistent-return
         return getSheets();
       }

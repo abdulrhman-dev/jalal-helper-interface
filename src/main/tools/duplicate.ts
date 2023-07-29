@@ -10,12 +10,14 @@ let workbook: WorkBook | undefined;
 let duplicateObject: object;
 let config: DuplicateClientConfig;
 
-export const initialize = (dir: string) => {
+export const initialize = async (dir: string) => {
   workbook = new WorkBook(dir, {
     cellStyles: true,
     cellText: true,
     codepage: 65001,
   });
+
+  await workbook.initFile();
 };
 
 export const getWorkBook = () => {

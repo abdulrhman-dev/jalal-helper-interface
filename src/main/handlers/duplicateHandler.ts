@@ -35,7 +35,7 @@ export default () => {
       const dir: string | undefined = filePaths[0];
 
       if (dir) {
-        initialize(dir);
+        await initialize(dir);
 
         const workbookSheets = getSheets();
 

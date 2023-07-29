@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable no-underscore-dangle */
 import * as XLSX from 'xlsx';
+import fs from 'fs/promises';
 
 // eslint-disable-next-line import/no-cycle
 import WorkSheet from './WorkSheet';
@@ -23,10 +24,21 @@ class Workbook {
   constructor(filename?: string, options?: XLSX.ParsingOptions) {
     if (filename) {
       this.filename = filename;
-      this._workbook = XLSX.readFile(filename, options);
     } else {
       this._workbook = XLSX.utils.book_new();
+
+      this.Sheets = this._workbook.Sheets;
+      this.SheetNames = this._workbook.SheetNames;
+      this.Props = this._workbook.Props;
+      this.Custprops = this._workbook.Custprops;
+      this.vbaraw = this._workbook.vbaraw;
     }
+  }
+
+  async initFile() {
+    const data = await fs.readFile(this.filename, 'base64');
+
+    this._workbook = await XLSX.read(data);
 
     this.Sheets = this._workbook.Sheets;
     this.SheetNames = this._workbook.SheetNames;
